@@ -11,18 +11,23 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Session\Container;
 
 class UserController extends AbstractActionController
 {
     public function listAction()
     {
+        /* get parameters */
+        $order_by = $this->params()->fromRoute('order_by');
+        $order = $this->params()->fromRoute('order');
 
-        $users = $this->getServiceLocator()->get('entity_manager')
-            ->getRepository('Application\Entity\User')
-            ->findAll();
+        /** @var $repoUser \Application\Mapper\User */
+        $repoUser = $this->getServiceLocator()->get('entity_manager')
+            ->getRepository('Application\Entity\User');
 
         return new ViewModel(array(
-            'users' =>  $users
+            'users' =>  $repoUser->fetchSortable($order_by, $order),
+            'sortable' => $this->_setListSortable($order_by, $order)
         ));
     }
 
@@ -82,11 +87,11 @@ class UserController extends AbstractActionController
 
         /* @var $form \Application\Form\UserForm */
         $form = $this->getServiceLocator()->get('formElementManager')->get('form.user');
-        $form->setValidationGroup(array('firstname', 'lastname', 'email', 'address', 'birthday'));
         $userToEdit = $em->getRepository('Application\Entity\User')
             ->find($this->params()->fromRoute('user_id'));
 
         $form->bind($userToEdit);
+
         /* set profile field */
         $form->get('firstname')->setValue($userToEdit->getFirstName());
         $form->get('lastname')->setValue($userToEdit->getLastName());
@@ -100,6 +105,10 @@ class UserController extends AbstractActionController
         }
 
         if ($data != false) {
+            /* if password empty no validate it*/
+            if($data['password'] === ''){
+                $form->setValidationGroup(array('firstname', 'lastname', 'email', 'address', 'birthday'));
+            }
             $form->setData($data);
             if ($form->isValid()) {
 
@@ -119,4 +128,42 @@ class UserController extends AbstractActionController
         ));
     }
 
+    private function _setOrder($order)
+    {
+        if($order === 'ASC'){
+            return 'DESC';
+        }
+        return 'ASC';
+    }
+
+    private function _setListSortable($order_by, $order)
+    {
+        $sortable = array(
+            'id' => $this->url()->fromRoute('users', array(
+                    'order_by' => 'u.id',
+                    'order' => ($order_by == 'u.id' ? $this->_setOrder($order) : 'ASC'))
+            ),
+            'firstName' => $this->url()->fromRoute('users', array(
+                    'order_by' => 'p.firstName',
+                    'order' => ($order_by == 'p.firstName' ? $this->_setOrder($order) : 'ASC'))
+            ),
+            'lastName' => $this->url()->fromRoute('users', array(
+                    'order_by' => 'p.lastName',
+                    'order' => ($order_by == 'p.lastName' ? $this->_setOrder($order) : 'ASC'))
+            ),
+            'email' => $this->url()->fromRoute('users', array(
+                    'order_by' => 'u.email',
+                    'order' => ($order_by == 'u.email' ? $this->_setOrder($order) : 'ASC'))
+            ),
+            'birthday' => $this->url()->fromRoute('users', array(
+                    'order_by' => 'p.birthday',
+                    'order' => ($order_by == 'p.birthday' ? $this->_setOrder($order) : 'ASC'))
+            ),
+            'address' => $this->url()->fromRoute('users', array(
+                    'order_by' => 'p.address',
+                    'order' => ($order_by == 'p.address' ? $this->_setOrder($order) : 'ASC'))
+            )
+        );
+        return $sortable;
+    }
 }

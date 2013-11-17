@@ -1,6 +1,7 @@
 <?php
 return array(
     '__users_list'  =>  'Liste des utilisaturs',
+    '__users_password_empty' => 'laisser vide pour ne pas le changer',
 
     '__add_user'    =>  'Ajouter un utilisateur',
     '__remove_user' =>  'Supprimer',

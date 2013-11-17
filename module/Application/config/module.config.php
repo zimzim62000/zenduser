@@ -52,13 +52,19 @@ return array(
                 ),
             ),
             'users' =>  array(
-                'type'  =>  'Literal',
+                'type'  =>  'Segment',
                 'options'   =>  array(
-                    'route' =>  '/users',
+                    'route' =>  '/users/:order_by/:order',
+                    'constraints' => array(
+                        'order_by' => '[a-zA-Z._-]*',
+                        'order' => 'ASC|DESC'
+                    ),
                     'defaults'  =>  array(
                         '__NAMESPACE__' => 'Application\Controller',
                         'controller'    => 'User',
                         'action'        => 'list',
+                        'order_by' => 'u.id',
+                        'order' => 'ASC'
                     )
                 ),
                 'may_terminate' => true,

@@ -12,14 +12,6 @@ class UserForm extends InputFilter
      */
     protected $sm = null;
 
-    public $id;
-    public $firstname;
-    public $lastname;
-    public $email;
-    public $password;
-    public $address;
-    public $birthday;
-
     /**
      * Set service manager
      *
@@ -41,17 +33,6 @@ class UserForm extends InputFilter
     public function getServiceManager()
     {
         return $this->sm;
-    }
-
-    public function exchangeArray($data)
-    {
-        $this->id     = (isset($data['id']))     ? $data['id']     : null;
-        $this->firstname = (isset($data['firstname'])) ? $data['firstname'] : null;
-        $this->lastname  = (isset($data['lastname']))  ? $data['lastname']  : null;
-        $this->email  = (isset($data['email']))  ? $data['email']  : null;
-        $this->password  = (isset($data['password']))  ? $data['password']  : null;
-        $this->birthday  = (isset($data['birthday']))  ? $data['birthday']  : null;
-        $this->address  = (isset($data['address']))  ? $data['address']  : null;
     }
 
     public function __construct($sm)
